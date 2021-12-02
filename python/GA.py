@@ -58,7 +58,7 @@ def main():
         pop = generate_pop(pop_size)
 
         ## Halving the size everytime
-        for j in range(12):
+        for j in range(11):
             pop = helper.battling(pop)
 
         # Run GA
@@ -66,9 +66,8 @@ def main():
             print(f"---itr {itr} ---")
             scores = helper.get_scores(pop)
             pop = sort_pop_by_score(pop, scores)
-            print(pop)
-            crossover(pop, crossover_prop)
             mutate(pop, mutate_prop)
+            crossover(pop, crossover_prop)
 
         helper.updateWinningGenes(pop)
 
