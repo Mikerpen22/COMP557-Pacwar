@@ -45,10 +45,10 @@ def sort_pop_by_score(pop, scores):
 
 def main():
     # parameters we use
-    numOfPopulations = 100
+    numOfPopulations = 20
     iterations = 50
     winning_group_size = 10
-    pop_size = pow(2, 12)
+    pop_size = pow(2, 13)
     mutate_prop = 0.02
     crossover_prop = 0.2
     helper.init_winning_write(winning_group_size)
@@ -69,7 +69,6 @@ def main():
             print(pop)
             crossover(pop, crossover_prop)
             mutate(pop, mutate_prop)
-        print("...checking champions")
 
         helper.updateWinningGenes(pop)
 

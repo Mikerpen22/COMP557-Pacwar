@@ -1,4 +1,3 @@
-import os
 import random
 import _PyPacwar
 
@@ -35,6 +34,8 @@ def clear_winning():
     writer = open("winning.txt", "w")
     writer.truncate(0)
 
+
+## Coverting between str <-> (gene_sequence, score)
 def gene_to_str(gene, score):
     return ''.join(str(i) + " " for i in gene) + str(score) + "\n"
 
@@ -50,11 +51,13 @@ def str_to_gene(s):
 def generate_rand_gene():
     return [random.choice([0, 1, 2, 3]) for i in range(50)]
 
-
+## Initialize the champion in the beginning -> will be replaced by later iteration
 def create_random_champs(size):
     init_winning_write(size)
 
 
+## Have the genes battle each other
+## Score the gene based on the battle results
 def og_score(gene_1, gene_2):
     # print(_PyPacwar.battle(gene_1, gene_2))
     rounds, g1_left, g2_left = _PyPacwar.battle(gene_1, gene_2)
@@ -85,14 +88,17 @@ def og_score(gene_1, gene_2):
         else:
             return 0
 
+
+## Calculate the aggregated score
+## the parameter 0.2 can be changed
 def get_scores(pop):
     scores = []
     for gene_i, score_i in pop:
-        score = pop_score(gene_i[0], pop)
+        score = aggregated_score(gene_i[0], pop, 0.2)
         scores.append(score)
     return scores
 
-## Calculate gene_i's avg og_score against the whole pop
+## Calculate gene_i's avg og_score against the whole population
 def pop_score(gene_i, pop):
     og_scores_sum = []
     for gene_j, score in pop:
@@ -105,14 +111,16 @@ def pop_score(gene_i, pop):
 ## Calculate gene_i's avg score against the winning group
 def winning_pop_score(gene_i):
     og_scores = []
-    winning_genes = read_genes('winningGenes.txt')
+    winning_genes = read_genes('winning.txt')
     for winning_gene, winning_g_score in winning_genes:
-        og_score = og_score(gene_i, winning_gene)
-        og_scores.append(og_score)
+        score = og_score(gene_i, winning_gene)
+        og_scores.append(score)
     return sum(og_scores)/(len(og_scores)*1.0)
 
-# def aggregated_score(gene_i, pop):
-#     return winning_pop_score()
+# Calculates the aggregate score for a gene
+def aggregated_score(gene_i, pop, weight):
+    score = (1 - weight) * pop_score(gene_i, pop) + weight * winning_pop_score(gene_i)
+    return score
 
 # Take 2 genes in population and have it battle with each other
 # keep the winning one => the function will return the winning population
@@ -134,7 +142,11 @@ def sort_genes_by_score(pop, scores):
     return genes
 
 
+## Update the top 10 scoring genes
+## Have each of the winning gene to battle the gene_i in the population that's left
+## If lost, it'll be replaced
 def updateWinningGenes(pop):
+
     winning_genes = read_winning()
     winning_genes_updated = []
     scores_updated = []
@@ -143,19 +155,20 @@ def updateWinningGenes(pop):
         for gene_j, score_j in winning_genes:
             if (gene_j, 0) not in winning_genes_updated:
                 rounds, g_i_left, g_j_left = _PyPacwar.battle(gene_i, gene_j)
-                gene_j_score = pop_score(gene_j, pop)
+                gene_j_score = aggregated_score(gene_j, pop, 0.2)
                 winning_genes_updated.append((gene_j, 0))
                 scores_updated.append(gene_j_score)
 
             if (gene_i, 0) not in winning_genes_updated:
                 if g_i_left > g_j_left:
-                        gene_i_score = pop_score(gene_i, pop)
+                        gene_i_score = aggregated_score(gene_i, pop, 0.2)
                         winning_genes_updated.append((gene_i, 0))
                         scores_updated.append(gene_i_score)
 
-    winning_genes_updated = sort_genes_by_score(winning_genes, scores_updated)[0:12]
+
+    winning_genes_updated = sort_genes_by_score(winning_genes, scores_updated)[0:10]
 
     clear_winning()
-    write_genes(winning_genes_updated, "winning.txt")
-    print("Best Gene: ", winning_genes_updated[0][0], max(scores_updated))
+    write_genes(winning_genes_updated, "winning.txt")   # Update/ Write top 10 new genes to the file
+    print("Best Gene for this itr: ",  max(scores_updated), winning_genes_updated[0][0])
     return winning_genes_updated
