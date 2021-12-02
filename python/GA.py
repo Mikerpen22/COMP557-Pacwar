@@ -45,13 +45,13 @@ def sort_pop_by_score(pop, scores):
 
 def main():
     # parameters we use
-    numOfPopulations = 20
-    iterations = 50
-    winning_group_size = 10
-    pop_size = pow(2, 13)
-    mutate_prop = 0.02
-    crossover_prop = 0.2
-    helper.init_winning_write(winning_group_size)
+    numOfPopulations = 20   # Think of it as evolutions
+    iterations = 50     # How many times you want the genes in population to battle each other
+    winning_group_size = 10     # we want to keep track of the top 10 genes
+    pop_size = pow(2, 13)       # size for a single population
+    mutate_prop = 0.02          # mutation probability
+    crossover_prop = 0.2        # crossover probability
+    helper.init_winning_write(winning_group_size)   # randomly write 10 genes to the file for the program to start
 
     for i in range(numOfPopulations):
         ## Generate population
@@ -69,6 +69,7 @@ def main():
             mutate(pop, mutate_prop)
             crossover(pop, crossover_prop)
 
+        ## Update the top 10, write to file
         helper.updateWinningGenes(pop)
 
 
