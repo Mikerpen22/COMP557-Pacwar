@@ -13,12 +13,12 @@ def read_genes(file):
     return genes
 
 def write_gene(gene, score, file):
-    with open('res_file', 'w') as writer:
+    with open(file, 'w') as writer:
         writer.write(gene, score)
 
 
 def write_genes(genes, file):
-    with open('res_file', 'w') as writer:
+    with open(file, 'w') as writer:
         for gene in genes:
             writer.write(gene_to_str(gene[0], gene[1]))
 
@@ -156,6 +156,6 @@ def updateWinningGenes(pop):
     winning_genes_updated = sort_genes_by_score(winning_genes, scores_updated)[0:12]
 
     clear_winning()
-    write_genes(winning_genes_updated, "champions.txt")
+    write_genes(winning_genes_updated, "winning.txt")
     print("Best Gene: ", winning_genes_updated[0][0], max(scores_updated))
     return winning_genes_updated
